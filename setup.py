@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 
 long_description = """
@@ -48,11 +48,11 @@ or just copy ntplib.py inside a directory in your sys.path, e.g.
 
 
 setup(name='ntplib',
-      version='0.3.3',
+      version='0.3.4',
       description='Python NTP library',
       author='Charles-Francois Natali',
       author_email='cf.natali@gmail.com',
-      url='http://code.google.com/p/ntplib/',
+      url='https://github.com/cf-natali/ntplib',
       py_modules=['ntplib'],
       license='MIT',
       classifiers=[
