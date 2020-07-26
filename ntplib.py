@@ -230,6 +230,7 @@ class NTPStats(NTPPacket):
         NTPPacket.__init__(self)
         self.dest_timestamp = 0
         """destination timestamp"""
+        self.dest_host = None
 
     @property
     def offset(self):
@@ -291,6 +292,7 @@ class NTPClient:
         # lookup server address
         addrinfo = socket.getaddrinfo(host, port)[0]
         family, sockaddr = addrinfo[0], addrinfo[4]
+        dest_host = sockaddr[0]
 
         # create the socket
         s = socket.socket(family, socket.SOCK_DGRAM)
@@ -307,7 +309,7 @@ class NTPClient:
 
             # wait for the response - check the source address
             src_addr = None,
-            while src_addr[0] != sockaddr[0]:
+            while src_addr[0] != dest_host:
                 response_packet, src_addr = s.recvfrom(256)
 
             # build the destination timestamp
@@ -321,7 +323,7 @@ class NTPClient:
         stats = NTPStats()
         stats.from_data(response_packet)
         stats.dest_timestamp = dest_timestamp
-
+        stats.dest_host = dest_host
         return stats
 
 
