@@ -81,6 +81,7 @@ class NTP:
         "1PPS":  "External 1 PPS input",
         "FREE":  "(Internal clock)",
         "INIT":  "(Initialization)",
+        "ROA\0": "Real Observatorio de la Armada",
         "\0\0\0\0":   "NULL",
     }
     """reference identifier table"""
