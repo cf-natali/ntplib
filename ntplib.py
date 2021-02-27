@@ -29,6 +29,7 @@ functions.
 
 
 import datetime
+import random
 import socket
 import struct
 import time
@@ -280,7 +281,7 @@ class NTPClient(object):
         """Constructor."""
         pass
 
-    def request(self, host, version=2, port="ntp", timeout=5):
+    def request(self, host, version=2, port="ntp", timeout=5, randomize=False):
         """Query a NTP server.
 
         Parameters:
@@ -288,12 +289,19 @@ class NTPClient(object):
         version -- NTP version to use
         port    -- server port
         timeout -- timeout on socket operations
+        randomize -- if True, then select a random lookup server address from
+            the list of random server addresses. Otherwise select the first one.
 
         Returns:
         NTPStats object
         """
         # lookup server address
-        addrinfo = socket.getaddrinfo(host, port)[0]
+        lookup_servers = socket.getaddrinfo(host, port)
+        if randomize:
+            addrinfo = random.choice(lookup_servers)
+        else:
+            addrinfo = lookup_servers[0]
+
         family, sockaddr = addrinfo[0], addrinfo[4]
 
         # create the socket
