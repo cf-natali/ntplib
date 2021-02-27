@@ -96,5 +96,5 @@ class TestNTPLib(unittest.TestCase):
                                                          info.stratum), str))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

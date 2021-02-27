@@ -1,3 +1,10 @@
+<h1 align="center">ntplib</h1>
+<div align="center">An NTP Client for Python</div>
+<br />
+
+[![PyPI Status](https://img.shields.io/pypi/v/ntplib.svg)](https://pypi.python.org/pypi/ntplib)
+[![Downloads](https://img.shields.io/pypi/dm/ntplib.svg)](https://pypi.python.org/pypi/ntplib)
+
 # Description
 
 This module offers a simple interface to query NTP servers from Python.
@@ -30,10 +37,6 @@ modules, it should work on any platform with a Python implementation.
 
 # Installation
 
-As root:
 ```
-# python setup.py install
+python setup.py install
 ```
-
-or just copy ntplib.py inside a directory in your sys.path, e.g. `/usr/lib/python2.5/`.
-
