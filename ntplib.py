@@ -113,7 +113,7 @@ class NTP:
     """leap indicator table"""
 
 
-class NTPPacket:
+class NTPPacket(object):
     """NTP packet class.
 
     This represents an NTP packet.
@@ -167,7 +167,8 @@ class NTPPacket:
         NTPException -- in case of invalid field
         """
         try:
-            packed = struct.pack(NTPPacket._PACKET_FORMAT,
+            packed = struct.pack(
+                NTPPacket._PACKET_FORMAT,
                 (self.leap << 6 | self.version << 3 | self.mode),
                 self.stratum,
                 self.poll,
@@ -199,8 +200,10 @@ class NTPPacket:
         NTPException -- in case of invalid packet format
         """
         try:
-            unpacked = struct.unpack(NTPPacket._PACKET_FORMAT,
-                    data[0:struct.calcsize(NTPPacket._PACKET_FORMAT)])
+            unpacked = struct.unpack(
+                NTPPacket._PACKET_FORMAT,
+                data[0:struct.calcsize(NTPPacket._PACKET_FORMAT)]
+            )
         except struct.error:
             raise NTPException("Invalid NTP packet.")
 
@@ -228,7 +231,7 @@ class NTPStats(NTPPacket):
 
     def __init__(self):
         """Constructor."""
-        NTPPacket.__init__(self)
+        super(NTPStats, self).__init__()
         self.dest_timestamp = 0
         """destination timestamp"""
 
@@ -270,14 +273,14 @@ class NTPStats(NTPPacket):
         return ntp_to_system_time(self.dest_timestamp)
 
 
-class NTPClient:
+class NTPClient(object):
     """NTP client session."""
 
     def __init__(self):
         """Constructor."""
         pass
 
-    def request(self, host, version=2, port='ntp', timeout=5):
+    def request(self, host, version=2, port="ntp", timeout=5):
         """Query a NTP server.
 
         Parameters:
@@ -300,8 +303,11 @@ class NTPClient:
             s.settimeout(timeout)
 
             # create the request packet - mode 3 is client
-            query_packet = NTPPacket(mode=3, version=version,
-                                tx_timestamp=system_to_ntp_time(time.time()))
+            query_packet = NTPPacket(
+                mode=3,
+                version=version,
+                tx_timestamp=system_to_ntp_time(time.time())
+            )
 
             # send the request
             s.sendto(query_packet.to_data(), sockaddr)
@@ -438,11 +444,11 @@ def stratum_to_text(stratum):
     NTPException -- in case of invalid stratum
     """
     if stratum in NTP.STRATUM_TABLE:
-        return NTP.STRATUM_TABLE[stratum] % (stratum)
+        return NTP.STRATUM_TABLE[stratum] % stratum
     elif 1 < stratum < 16:
-        return "secondary reference (%s)" % (stratum)
+        return "secondary reference (%s)" % stratum
     elif stratum == 16:
-        return "unsynchronized (%s)" % (stratum)
+        return "unsynchronized (%s)" % stratum
     else:
         raise NTPException("Invalid stratum or reserved.")
 
@@ -465,12 +471,12 @@ def ref_id_to_text(ref_id, stratum=2):
 
     # return the result as a string or dot-formatted IP address
     if 0 <= stratum <= 1:
-        text = '%c%c%c%c' % fields
+        text = "%c%c%c%c" % fields
         if text in NTP.REF_ID_TABLE:
             return NTP.REF_ID_TABLE[text]
         else:
-            return "Unidentified reference source '%s'" % (text)
+            return "Unidentified reference source '%s'" % text
     elif 2 <= stratum < 255:
-        return '%d.%d.%d.%d' % fields
+        return "%d.%d.%d.%d" % fields
     else:
         raise NTPException("Invalid stratum.")

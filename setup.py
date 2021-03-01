@@ -47,19 +47,25 @@ or just copy ntplib.py inside a directory in your sys.path, e.g.
 """
 
 
-setup(name='ntplib',
-      version='0.3.4',
-      description='Python NTP library',
-      author='Charles-Francois Natali',
-      author_email='cf.natali@gmail.com',
-      url='https://github.com/cf-natali/ntplib',
-      py_modules=['ntplib'],
-      license='MIT',
-      classifiers=[
-          'License :: OSI Approved :: MIT License',
-          'Programming Language :: Python',
-          'Operating System :: OS Independent',
-          'Topic :: System :: Networking :: Time Synchronization'
-      ],
-      long_description=long_description
-     )
+setup(
+    name="ntplib",
+    version="0.3.5",
+    description="Python NTP library",
+    author="Charles-Francois Natali",
+    author_email="cf.natali@gmail.com",
+    url="https://github.com/cf-natali/ntplib",
+    py_modules=["ntplib"],
+    license="MIT",
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python",
+        "Operating System :: OS Independent",
+        "Topic :: System :: Networking :: Time Synchronization",
+        "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+    ],
+    long_description=long_description
+)
