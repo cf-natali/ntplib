@@ -1,3 +1,7 @@
+version 0.3.4 - 2020-04-28
+--------------------------
+- Re-release of 0.3.3 (0.3.3 was mistakenly deleted from PyPI)
+
 version 0.3.3 - 2015-07-27
 --------------------------
 - Change to more permissive MIT license
