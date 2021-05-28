@@ -49,7 +49,7 @@ or just copy ntplib.py inside a directory in your sys.path, e.g.
 
 setup(
     name="ntplib",
-    version="0.3.5",
+    version="0.4.0",
     description="Python NTP library",
     author="Charles-Francois Natali",
     author_email="cf.natali@gmail.com",
