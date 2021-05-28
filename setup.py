@@ -33,17 +33,6 @@ Example
 0.0046844482421875
 >>> ntplib.ref_id_to_text(response.ref_id)
 193.190.230.66
-
-
-Installation
-------------
-
-As root::
-
-   # python setup.py install
-
-or just copy ntplib.py inside a directory in your sys.path, e.g.
-`/usr/lib/python2.5/`.
 """
 
 
