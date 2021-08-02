@@ -87,7 +87,7 @@ class NTP:
     """reference identifier table"""
 
     STRATUM_TABLE = {
-        0: "unspecified or invalid",
+        0: "unspecified or invalid (%s)",
         1: "primary reference (%s)",
     }
     """stratum table"""
