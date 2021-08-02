@@ -87,7 +87,7 @@ class NTP:
     """reference identifier table"""
 
     STRATUM_TABLE = {
-        0: "unspecified or invalid",
+        0: "unspecified or invalid (%s)",
         1: "primary reference (%s)",
     }
     """stratum table"""
@@ -365,7 +365,7 @@ def _to_time(integ, frac, n=32):
     frac  -- fractional part
     n     -- number of bits of the fractional part
 
-    Retuns:
+    Returns:
     timestamp
     """
     return integ + float(frac)/2**n
@@ -457,7 +457,7 @@ def ref_id_to_text(ref_id, stratum=2):
     """Convert a reference clock identifier to text according to its stratum.
 
     Parameters:
-    ref_id  -- reference clock indentifier
+    ref_id  -- reference clock identifier
     stratum -- NTP stratum
 
     Returns:
