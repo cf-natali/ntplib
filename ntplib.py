@@ -155,7 +155,7 @@ class NTPPacket(object):
         self.recv_timestamp = 0
         """receive timestamp"""
         self.tx_timestamp = tx_timestamp
-        """tansmit timestamp"""
+        """transmit timestamp"""
 
     def to_data(self):
         """Convert this NTPPacket to a buffer that can be sent over a socket.
@@ -338,7 +338,7 @@ def _to_int(timestamp):
     Parameters:
     timestamp -- NTP timestamp
 
-    Retuns:
+    Returns:
     integral part
     """
     return int(timestamp)
@@ -351,7 +351,7 @@ def _to_frac(timestamp, n=32):
     timestamp -- NTP timestamp
     n         -- number of bits of the fractional part
 
-    Retuns:
+    Returns:
     fractional part
     """
     return int(abs(timestamp - _to_int(timestamp)) * 2**n)
