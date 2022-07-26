@@ -280,7 +280,7 @@ class NTPClient(object):
         """Constructor."""
         pass
 
-    def request(self, host, version=2, port="ntp", timeout=5):
+    def request(self, host, version=2, port="ntp", timeout=5, addressfamily=""):
         """Query a NTP server.
 
         Parameters:
@@ -288,12 +288,20 @@ class NTPClient(object):
         version -- NTP version to use
         port    -- server port
         timeout -- timeout on socket operations
+        addressfamily -- socket address family (IPv4 or IPv6)
 
         Returns:
         NTPStats object
         """
+
         # lookup server address
-        addrinfo = socket.getaddrinfo(host, port)[0]
+        if addressfamily == "IPv6":
+            addrinfo = socket.getaddrinfo(host, port, family=socket.AF_INET6)[0]
+        elif addressfamily == "IPv4":
+            addrinfo = socket.getaddrinfo(host, port, family=socket.AF_INET)[0]
+        else:
+            addrinfo = socket.getaddrinfo(host, port)[0]
+        #addrinfo = socket.getaddrinfo(host, port, family=addressfamily)[0]
         family, sockaddr = addrinfo[0], addrinfo[4]
 
         # create the socket
