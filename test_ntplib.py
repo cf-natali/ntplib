@@ -1,6 +1,7 @@
 """Python NTP library tests."""
 
 
+import datetime
 import time
 import unittest
 
@@ -94,6 +95,22 @@ class TestNTPLib(unittest.TestCase):
         self.assertTrue(isinstance(ntplib.stratum_to_text(info.stratum), str))
         self.assertTrue(isinstance(ntplib.ref_id_to_text(info.ref_id,
                                                          info.stratum), str))
+
+    def test_rollover(self):
+        """ Test for rollover - see
+            https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps.
+        """
+        ts = datetime.datetime(2022, 8, 5, 19, 8, 42).timestamp()
+        self.assertEqual(
+                ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(ts)), ts)
+
+        ts = datetime.datetime(2036, 2, 7).timestamp()
+        self.assertEqual(
+                ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(ts)), ts)
+
+        ts = datetime.datetime(2036, 2, 7, 12).timestamp()
+        self.assertRaises(ntplib.NTPRolloverException,
+                          ntplib.system_to_ntp_time, ts)
 
 
 if __name__ == "__main__":
