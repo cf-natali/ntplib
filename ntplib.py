@@ -32,6 +32,7 @@ import datetime
 import socket
 import struct
 import time
+import asyncio
 
 
 class NTPException(Exception):
@@ -330,6 +331,69 @@ class NTPClient(object):
         stats.dest_timestamp = dest_timestamp
 
         return stats
+
+    async def request_async(self, host, version=2, port="ntp"):
+        """Query a NTP server.
+
+        Parameters:
+        host    -- server name/address
+        version -- NTP version to use
+        port    -- server port
+
+        Returns:
+        NTPStats object
+        """
+
+        class NTPClientProtocol:
+            def __init__(self, on_con_lost):
+                self.on_con_lost = on_con_lost
+                self.transport = None
+
+            def connection_made(self, transport):
+                self.transport = transport
+                # create the request packet - mode 3 is client
+                query_packet = NTPPacket(
+                    mode=3,
+                    version=version,
+                    tx_timestamp=system_to_ntp_time(time.time())
+                )
+                # send the request
+                self.transport.sendto(query_packet.to_data())
+
+            def datagram_received(self, data, addr):
+                # build the destination timestamp
+                dest_timestamp = system_to_ntp_time(time.time())
+
+                self.transport.close()
+
+                # construct corresponding statistics
+                self.stats = NTPStats()
+                self.stats.from_data(data)
+                self.stats.dest_timestamp = dest_timestamp
+
+            # def error_received(self, exc):
+                # pass
+
+            def connection_lost(self, exc):
+                self.on_con_lost.set_result(True)
+
+        loop = asyncio.get_running_loop()
+        # lookup server address
+        addrinfos = await loop.getaddrinfo(host, port)
+        family, typ, proto, name, addr = addrinfos[0]
+
+        on_con_lost = loop.create_future()
+
+        transport, protocol = await loop.create_datagram_endpoint(
+            lambda: NTPClientProtocol(on_con_lost),
+            remote_addr=addr)
+
+        try:
+            await on_con_lost
+        finally:
+            transport.close()
+
+        return protocol.stats
 
 
 def _to_int(timestamp):
