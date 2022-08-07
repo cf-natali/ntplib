@@ -332,13 +332,14 @@ class NTPClient(object):
 
         return stats
 
-    async def request_async(self, host, version=2, port="ntp"):
+    async def request_async(self, host, version=2, port="ntp", timeout=5):
         """Query a NTP server.
 
         Parameters:
         host    -- server name/address
         version -- NTP version to use
         port    -- server port
+        timeout -- timeout on socket operations
 
         Returns:
         NTPStats object
@@ -375,7 +376,8 @@ class NTPClient(object):
                 # pass
 
             def connection_lost(self, exc):
-                self.on_con_lost.set_result(True)
+                if not self.on_con_lost.done():
+                    self.on_con_lost.set_result(True)
 
         loop = asyncio.get_running_loop()
         # lookup server address
@@ -389,7 +391,9 @@ class NTPClient(object):
             remote_addr=addr)
 
         try:
-            await on_con_lost
+            await asyncio.wait_for(on_con_lost, timeout=timeout)
+        except asyncio.TimeoutError:
+            raise NTPException("No response received from %s." % host)
         finally:
             transport.close()
 
