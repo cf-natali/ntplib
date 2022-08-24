@@ -1,3 +1,9 @@
+version 0.X.X - 2022-XX-XX
+--------------------------
+- Add a new `NTPRolloverException` raised when system time is beyond NTPv3
+  rollover (https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps)
+  Closes #18.
+
 version 0.4.0 - 2021-05-28
 --------------------------
 - flake8 conformance

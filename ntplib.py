@@ -39,6 +39,12 @@ class NTPException(Exception):
     pass
 
 
+class NTPRolloverException(NTPException):
+    """Exception raised when the system time is beyond the NTPv3 rollover. """
+    # See https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps
+    pass
+
+
 class NTP:
     """Helper class defining constants."""
 
@@ -392,6 +398,10 @@ def system_to_ntp_time(timestamp):
     Returns:
     corresponding NTP time
     """
+    if timestamp >= (NTP._NTP_EPOCH +
+                     datetime.timedelta(seconds=2 ** 32)).timestamp():
+        raise NTPRolloverException("Timestamp %s is beyond NTPv3 rollover" %
+                                   timestamp)
     return timestamp + NTP.NTP_DELTA
 
 
