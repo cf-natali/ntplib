@@ -102,17 +102,18 @@ class TestNTPLib(unittest.TestCase):
         """ Test for rollover - see
             https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps.
         """
-        timestamp = datetime.datetime(2022, 8, 5, 19, 8, 42).timestamp()
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        timestamp = (datetime.datetime(2022, 8, 5, 19, 8, 42) - epoch).total_seconds()
         self.assertEqual(
                 ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(timestamp)),
                 timestamp)
 
-        timestamp = datetime.datetime(2036, 2, 7).timestamp()
+        timestamp = (datetime.datetime(2036, 2, 7) - epoch).total_seconds()
         self.assertEqual(
                 ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(timestamp)),
                 timestamp)
 
-        timestamp = datetime.datetime(2036, 2, 7, 12).timestamp()
+        timestamp = (datetime.datetime(2036, 2, 7, 12) - epoch).total_seconds()
         self.assertRaises(ntplib.NTPRolloverException,
                           ntplib.system_to_ntp_time, timestamp)
 

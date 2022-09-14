@@ -36,13 +36,11 @@ import time
 
 class NTPException(Exception):
     """Exception raised by this module."""
-    pass
 
 
 class NTPRolloverException(NTPException):
     """Exception raised when the system time is beyond the NTPv3 rollover. """
     # See https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps
-    pass
 
 
 class NTP:
@@ -284,9 +282,8 @@ class NTPClient(object):
 
     def __init__(self):
         """Constructor."""
-        pass
 
-    def request(self, host, version=2, port="ntp", timeout=5, address_family=socket.AF_UNSPEC):
+    def request(self, host, version=2, port="ntp", timeout=5, address_family=socket.AF_UNSPEC):  # pylint: disable=no-self-use,too-many-arguments
         """Query a NTP server.
 
         Parameters:
@@ -301,14 +298,14 @@ class NTPClient(object):
         """
 
         # lookup server address
-        addrinfo = socket.getaddrinfo(host, port, family=address_family)[0]
+        addrinfo = socket.getaddrinfo(host, port, address_family)[0]
         family, sockaddr = addrinfo[0], addrinfo[4]
 
         # create the socket
-        s = socket.socket(family, socket.SOCK_DGRAM)
+        sock = socket.socket(family, socket.SOCK_DGRAM)
 
         try:
-            s.settimeout(timeout)
+            sock.settimeout(timeout)
 
             # create the request packet - mode 3 is client
             query_packet = NTPPacket(
@@ -318,19 +315,19 @@ class NTPClient(object):
             )
 
             # send the request
-            s.sendto(query_packet.to_data(), sockaddr)
+            sock.sendto(query_packet.to_data(), sockaddr)
 
             # wait for the response - check the source address
-            src_addr = None,
+            src_addr = (None,)
             while src_addr[0] != sockaddr[0]:
-                response_packet, src_addr = s.recvfrom(256)
+                response_packet, src_addr = sock.recvfrom(256)
 
             # build the destination timestamp
             dest_timestamp = system_to_ntp_time(time.time())
         except socket.timeout:
             raise NTPException("No response received from %s." % host)
         finally:
-            s.close()
+            sock.close()
 
         # construct corresponding statistics
         stats = NTPStats()
@@ -352,31 +349,31 @@ def _to_int(timestamp):
     return int(timestamp)
 
 
-def _to_frac(timestamp, n=32):
+def _to_frac(timestamp, bits=32):
     """Return the fractional part of a timestamp.
 
     Parameters:
     timestamp -- NTP timestamp
-    n         -- number of bits of the fractional part
+    bits      -- number of bits of the fractional part
 
     Returns:
     fractional part
     """
-    return int(abs(timestamp - _to_int(timestamp)) * 2**n)
+    return int(abs(timestamp - _to_int(timestamp)) * 2**bits)
 
 
-def _to_time(integ, frac, n=32):
+def _to_time(integ, frac, bits=32):
     """Return a timestamp from an integral and fractional part.
 
     Parameters:
     integ -- integral part
     frac  -- fractional part
-    n     -- number of bits of the fractional part
+    bits  -- number of bits of the fractional part
 
     Returns:
     timestamp
     """
-    return integ + float(frac)/2**n
+    return integ + float(frac)/2**bits
 
 
 def ntp_to_system_time(timestamp):
@@ -400,11 +397,11 @@ def system_to_ntp_time(timestamp):
     Returns:
     corresponding NTP time
     """
-    if timestamp >= (NTP._NTP_EPOCH +
-                     datetime.timedelta(seconds=2 ** 32)).timestamp():
+    ntp_time = timestamp + NTP.NTP_DELTA
+    if ntp_time >= 2 ** 32:
         raise NTPRolloverException("Timestamp %s is beyond NTPv3 rollover" %
                                    timestamp)
-    return timestamp + NTP.NTP_DELTA
+    return ntp_time
 
 
 def leap_to_text(leap):
