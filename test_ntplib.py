@@ -10,6 +10,7 @@ import ntplib
 
 
 class TestNTPLib(unittest.TestCase):
+    """ Main test. """
 
     NTP_SERVER = "pool.ntp.org"
     """test NTP server"""
@@ -30,9 +31,9 @@ class TestNTPLib(unittest.TestCase):
         """Request tests."""
         client = ntplib.NTPClient()
 
-        t1 = time.time()
+        t_1 = time.time()
         info = client.request(self.NTP_SERVER)
-        t2 = time.time()
+        t_2 = time.time()
 
         # check response
         self.assertTrue(isinstance(info, ntplib.NTPStats))
@@ -60,7 +61,7 @@ class TestNTPLib(unittest.TestCase):
         new_info = client.request(self.NTP_SERVER)
 
         # check timestamps
-        self.assertTrue(t1 < info.orig_time < info.dest_time < t2)
+        self.assertTrue(t_1 < info.orig_time < info.dest_time < t_2)
         self.assertTrue(info.orig_time < new_info.orig_time)
         self.assertTrue(info.recv_time < new_info.recv_time)
         self.assertTrue(info.tx_time < new_info.tx_time)
@@ -76,10 +77,10 @@ class TestNTPLib(unittest.TestCase):
                           client.request, "localhost", port=42)
 
         # try reaching a non existent server with a custom timeout
-        t = time.time()
+        t_before = time.time()
         self.assertRaises(ntplib.NTPException,
                           client.request, "localhost", port=42, timeout=1)
-        self.assertTrue(0.7 < time.time() - t < 1.3)
+        self.assertTrue(0.7 < time.time() - t_before < 1.3)
 
     def test_helpers(self):
         """Helper methods tests."""
@@ -101,19 +102,22 @@ class TestNTPLib(unittest.TestCase):
         """ Test for rollover - see
             https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps.
         """
-        ts = datetime.datetime(2022, 8, 5, 19, 8, 42).timestamp()
+        timestamp = datetime.datetime(2022, 8, 5, 19, 8, 42).timestamp()
         self.assertEqual(
-                ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(ts)), ts)
+                ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(timestamp)),
+                timestamp)
 
-        ts = datetime.datetime(2036, 2, 7).timestamp()
+        timestamp = datetime.datetime(2036, 2, 7).timestamp()
         self.assertEqual(
-                ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(ts)), ts)
+                ntplib.ntp_to_system_time(ntplib.system_to_ntp_time(timestamp)),
+                timestamp)
 
-        ts = datetime.datetime(2036, 2, 7, 12).timestamp()
+        timestamp = datetime.datetime(2036, 2, 7, 12).timestamp()
         self.assertRaises(ntplib.NTPRolloverException,
-                          ntplib.system_to_ntp_time, ts)
+                          ntplib.system_to_ntp_time, timestamp)
 
     def test_address_family(self):
+        """ Test support of socket address family. """
         for address_family in [socket.AF_UNSPEC, socket.AF_INET]:
             client = ntplib.NTPClient()
             info = client.request(self.NTP_SERVER, address_family=address_family)
