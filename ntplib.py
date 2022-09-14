@@ -301,7 +301,7 @@ class NTPClient(object):
         """
 
         # lookup server address
-        addrinfo = socket.getaddrinfo(host, port, family=address_family)[0]
+        addrinfo = socket.getaddrinfo(host, port, address_family)[0]
         family, sockaddr = addrinfo[0], addrinfo[4]
 
         # create the socket
@@ -400,11 +400,11 @@ def system_to_ntp_time(timestamp):
     Returns:
     corresponding NTP time
     """
-    if timestamp >= (NTP._NTP_EPOCH +
-                     datetime.timedelta(seconds=2 ** 32)).timestamp():
+    ntp_time = timestamp + NTP.NTP_DELTA
+    if ntp_time >= 2 ** 32:
         raise NTPRolloverException("Timestamp %s is beyond NTPv3 rollover" %
                                    timestamp)
-    return timestamp + NTP.NTP_DELTA
+    return ntp_time
 
 
 def leap_to_text(leap):
