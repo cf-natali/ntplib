@@ -286,22 +286,22 @@ class NTPClient(object):
         """Constructor."""
         pass
 
-    def request(self, host, version=2, port="ntp", timeout=5, addressfamily=socket.AF_UNSPEC):
+    def request(self, host, version=2, port="ntp", timeout=5, address_family=socket.AF_UNSPEC):
         """Query a NTP server.
 
         Parameters:
-        host    -- server name/address
-        version -- NTP version to use
-        port    -- server port
-        timeout -- timeout on socket operations
-        addressfamily -- socket address family (IPv4 or IPv6)
+        host           -- server name/address
+        version        -- NTP version to use
+        port           -- server port
+        timeout        -- timeout on socket operations
+        address_family -- socket address family
 
         Returns:
         NTPStats object
         """
 
         # lookup server address
-        addrinfo = socket.getaddrinfo(host, port, family=addressfamily)[0]
+        addrinfo = socket.getaddrinfo(host, port, family=address_family)[0]
         family, sockaddr = addrinfo[0], addrinfo[4]
 
         # create the socket

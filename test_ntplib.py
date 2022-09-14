@@ -2,6 +2,7 @@
 
 
 import datetime
+import socket
 import time
 import unittest
 
@@ -111,6 +112,12 @@ class TestNTPLib(unittest.TestCase):
         ts = datetime.datetime(2036, 2, 7, 12).timestamp()
         self.assertRaises(ntplib.NTPRolloverException,
                           ntplib.system_to_ntp_time, ts)
+
+    def test_address_family(self):
+        for address_family in [socket.AF_UNSPEC, socket.AF_INET]:
+            client = ntplib.NTPClient()
+            info = client.request(self.NTP_SERVER, address_family=address_family)
+            self.assertLessEqual(info.offset, self.DELTA_TOLERANCE)
 
 
 if __name__ == "__main__":
