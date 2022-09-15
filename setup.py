@@ -1,7 +1,9 @@
+""" Setup. """
+
 from setuptools import setup
 
 
-long_description = """
+LONG_DESCRIPTION = """
 ntplib - Python NTP library
 ===========================
 
@@ -56,5 +58,5 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
-    long_description=long_description
+    long_description=LONG_DESCRIPTION
 )
