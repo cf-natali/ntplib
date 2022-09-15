@@ -1,0 +1,12 @@
+[MESSAGES CONTROL]
+
+disable = bad-continuation,
+          consider-using-f-string,
+          no-else-return,
+          old-style-class,
+          raise-missing-from,
+          super-with-arguments,
+          too-few-public-methods,
+          too-many-instance-attributes,
+          useless-object-inheritance,
+          useless-option-value

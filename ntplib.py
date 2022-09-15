@@ -43,7 +43,7 @@ class NTPRolloverException(NTPException):
     # See https://en.wikipedia.org/wiki/Network_Time_Protocol#Timestamps
 
 
-class NTP:
+class NTP:  # pylint: disable=no-init
     """Helper class defining constants."""
 
     _SYSTEM_EPOCH = datetime.datetime(*time.gmtime(0)[0:3])
