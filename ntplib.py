@@ -32,6 +32,7 @@ import datetime
 import socket
 import struct
 import time
+import random
 
 
 class NTPException(Exception):
@@ -298,7 +299,8 @@ class NTPClient(object):
         """
 
         # lookup server address
-        addrinfo = socket.getaddrinfo(host, port, address_family)[0]
+        addrinfo_a = socket.getaddrinfo(host, port, address_family)
+        addrinfo = addrinfo_a[random.randrange(0,len(addrinfo_a))]
         family, sockaddr = addrinfo[0], addrinfo[4]
 
         # create the socket
