@@ -281,6 +281,8 @@ class NTPStats(NTPPacket):
 class NTPClient(object):
     """NTP client session."""
 
+    _MAX_HOSTS_TO_TRY = 8 # Normally pool responses are 4 hosts and hence a max of 8 v4+v6 addresses; but other hosts could be higher
+
     def __init__(self):
         """Constructor."""
 
@@ -298,38 +300,62 @@ class NTPClient(object):
         NTPStats object
         """
 
-        # lookup server address
-        addrinfo_a = socket.getaddrinfo(host, port, address_family)
-        addrinfo = addrinfo_a[random.randrange(0,len(addrinfo_a))]
-        family, sockaddr = addrinfo[0], addrinfo[4]
-
-        # create the socket
-        sock = socket.socket(family, socket.SOCK_DGRAM)
-
+        dest_timestamp = None
         try:
-            sock.settimeout(timeout)
+            # lookup server address - request only datagram (i.e. UDP) addresses
+            addrinfo_a = socket.getaddrinfo(host, port, address_family, socket.SOCK_DGRAM)
+        except socket.gaierror:
+            # can happen for a v6 only resolvable hostname on a v4 only host (or a v4 only hostname on a v6 only host)
+            # getaddrinfo() tries to be clever; which is damn annoying!
+            raise NTPException("No resolved address(es) for %s." % host)
 
-            # create the request packet - mode 3 is client
-            query_packet = NTPPacket(
-                mode=3,
-                version=version,
-                tx_timestamp=system_to_ntp_time(time.time())
-            )
+        # we randomize the addresses in order to spread the load
+        # if a specific address does not work, no worries, we just continue to the next
+        # for sanity reasons (i.e. limiting random sample cpu usage); we limit the tries to _MAX_HOSTS_TO_TRY addresses
+        for addrinfo in random.sample(addrinfo_a, k=min(NTPClient._MAX_HOSTS_TO_TRY, len(addrinfo_a))):
+            if addrinfo[1] != socket.SOCK_DGRAM or addrinfo[2] != socket.IPPROTO_UDP:
+                # should not happen - no worries, try the next one
+                continue
 
-            # send the request
-            sock.sendto(query_packet.to_data(), sockaddr)
+            family, sockaddr = addrinfo[0], addrinfo[4]
 
-            # wait for the response - check the source address
-            src_addr = (None,)
-            while src_addr[0] != sockaddr[0]:
-                response_packet, src_addr = sock.recvfrom(256)
+            # create the socket for UDP datagram
+            try:
+                sock = socket.socket(family, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+            except OSError as e:
+                # should not happen - no worries, try the next one
+                continue
 
-            # build the destination timestamp
-            dest_timestamp = system_to_ntp_time(time.time())
-        except socket.timeout:
-            raise NTPException("No response received from %s." % host)
-        finally:
-            sock.close()
+            try:
+                # The timeout logic changes. We have N hosts to check, so we have to sum up the timeouts
+                sock.settimeout(timeout/min(NTPClient._MAX_HOSTS_TO_TRY, len(addrinfo_a)))
+
+                # create the request packet - mode 3 is client
+                query_packet = NTPPacket(
+                    mode=3,
+                    version=version,
+                    tx_timestamp=system_to_ntp_time(time.time())
+                )
+
+                # send the request
+                sock.sendto(query_packet.to_data(), sockaddr)
+
+                # wait for the response - check the source address
+                src_addr = (None,)
+                while src_addr[0] != sockaddr[0]:
+                    response_packet, src_addr = sock.recvfrom(256)
+
+                # build the destination timestamp
+                dest_timestamp = system_to_ntp_time(time.time())
+                break
+            except socket.timeout:
+                # try the next one - should not happen unless timeout or address not reachable!
+                continue
+            finally:
+                sock.close()
+
+        if not dest_timestamp:
+                raise NTPException("No response or timeout from %s." % host)
 
         # construct corresponding statistics
         stats = NTPStats()
