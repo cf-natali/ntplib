@@ -309,6 +309,8 @@ class NTPClient(object):
             # getaddrinfo() tries to be clever; which is damn annoying!
             raise NTPException("No resolved address(es) for %s." % host)
 
+        deadline = time.time() + timeout
+
         # we randomize the addresses in order to spread the load
         # if a specific address does not work, no worries, we just continue to the next
         # for sanity reasons (i.e. limiting random sample cpu usage); we limit the tries to _MAX_HOSTS_TO_TRY addresses
@@ -327,9 +329,13 @@ class NTPClient(object):
                 continue
 
             try:
-                # The timeout logic changes. We have N hosts to check, so we have to sum up the timeouts
-                sock.settimeout(timeout/min(NTPClient._MAX_HOSTS_TO_TRY, len(addrinfo_a)))
+                # The timeout logic changes. We see how much time we have left and just wait that long.
+                sock.settimeout(deadline - time.time())
+            except ValueError:
+                # We are done - timeout reached and we are not going to try/loop anymore
+                break
 
+            try:
                 # create the request packet - mode 3 is client
                 query_packet = NTPPacket(
                     mode=3,
