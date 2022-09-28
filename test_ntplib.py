@@ -13,13 +13,11 @@ class TestNTPLib(unittest.TestCase):
     """ Main test. """
 
     # Test NTP server.
-    NTP_SERVER = "pool.ntp.org"
+    NTP_SERVER = "time.cloudflare.com"
 
     # Tolerance for offset/delay comparisons, in seconds.
     DELTA_TOLERANCE = 0.5
 
-    # Request timeout.
-    TIMEOUT = 2
 
     def test_basic(self):
         """Basic tests."""
@@ -32,7 +30,7 @@ class TestNTPLib(unittest.TestCase):
         client = ntplib.NTPClient()
 
         t_1 = time.time()
-        info = client.request(self.NTP_SERVER, timeout=self.TIMEOUT)
+        info = client.request(self.NTP_SERVER)
         t_2 = time.time()
 
         # check response
@@ -56,7 +54,7 @@ class TestNTPLib(unittest.TestCase):
         self.assertTrue(isinstance(info.recv_time, float))
         self.assertTrue(isinstance(info.dest_time, float))
 
-        new_info = client.request(self.NTP_SERVER, timeout=self.TIMEOUT)
+        new_info = client.request(self.NTP_SERVER)
 
         # check timestamps
         self.assertTrue(t_1 < info.orig_time < info.dest_time < t_2)
@@ -84,7 +82,7 @@ class TestNTPLib(unittest.TestCase):
         """Helper methods tests."""
         client = ntplib.NTPClient()
 
-        info = client.request(self.NTP_SERVER, timeout=self.TIMEOUT)
+        info = client.request(self.NTP_SERVER)
 
         self.assertEqual(int(info.tx_time), ntplib.ntp_to_system_time(
                          ntplib.system_to_ntp_time(int(info.tx_time))))
@@ -118,8 +116,7 @@ class TestNTPLib(unittest.TestCase):
         """ Test support of socket address family. """
         for address_family in [socket.AF_UNSPEC, socket.AF_INET]:
             client = ntplib.NTPClient()
-            info = client.request(self.NTP_SERVER, timeout=self.TIMEOUT,
-                                  address_family=address_family)
+            info = client.request(self.NTP_SERVER, address_family=address_family)
             self.assertLessEqual(info.offset, self.DELTA_TOLERANCE)
 
 
