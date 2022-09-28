@@ -12,14 +12,12 @@ import ntplib
 class TestNTPLib(unittest.TestCase):
     """ Main test. """
 
-    NTP_SERVER = "pool.ntp.org"
-    """test NTP server"""
+    # Test NTP server.
+    NTP_SERVER = "time.cloudflare.com"
 
-    POLL_DELAY = 1
-    """delay between NTP polls, in seconds"""
-
+    # Tolerance for offset/delay comparisons, in seconds.
     DELTA_TOLERANCE = 0.5
-    """tolerance for offset/delay comparisons, in seconds"""
+
 
     def test_basic(self):
         """Basic tests."""
@@ -56,8 +54,6 @@ class TestNTPLib(unittest.TestCase):
         self.assertTrue(isinstance(info.recv_time, float))
         self.assertTrue(isinstance(info.dest_time, float))
 
-        time.sleep(self.POLL_DELAY)
-
         new_info = client.request(self.NTP_SERVER)
 
         # check timestamps
@@ -86,7 +82,6 @@ class TestNTPLib(unittest.TestCase):
         """Helper methods tests."""
         client = ntplib.NTPClient()
 
-        time.sleep(self.POLL_DELAY)
         info = client.request(self.NTP_SERVER)
 
         self.assertEqual(int(info.tx_time), ntplib.ntp_to_system_time(
