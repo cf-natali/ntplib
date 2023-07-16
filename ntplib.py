@@ -283,7 +283,7 @@ class NTPClient(object):
     def __init__(self):
         """Constructor."""
 
-    def request(self, host, version=2, port="ntp", timeout=5, address_family=socket.AF_UNSPEC):  # pylint: disable=no-self-use,too-many-arguments
+    def request(self, host, version=2, port=123, timeout=5, address_family=socket.AF_UNSPEC):  # pylint: disable=no-self-use,too-many-arguments
         """Query a NTP server.
 
         Parameters:
