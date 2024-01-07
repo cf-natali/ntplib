@@ -55,38 +55,38 @@ class NTP:  # pylint: disable=no-init
 
     REF_ID_TABLE = {
         "GOES":  "Geostationary Orbit Environment Satellite",
-        "GPS\0": "Global Position System",
-        "GAL\0": "Galileo Positioning System",
-        "PPS\0": "Generic pulse-per-second",
+        "GPS":   "Global Position System",
+        "GAL":   "Galileo Positioning System",
+        "PPS":   "Generic pulse-per-second",
         "IRIG":  "Inter-Range Instrumentation Group",
         "WWVB":  "LF Radio WWVB Ft. Collins, CO 60 kHz",
-        "DCF\0": "LF Radio DCF77 Mainflingen, DE 77.5 kHz",
-        "HBG\0": "LF Radio HBG Prangins, HB 75 kHz",
-        "MSF\0": "LF Radio MSF Anthorn, UK 60 kHz",
-        "JJY\0": "LF Radio JJY Fukushima, JP 40 kHz, Saga, JP 60 kHz",
+        "DCF":   "LF Radio DCF77 Mainflingen, DE 77.5 kHz",
+        "HBG":   "LF Radio HBG Prangins, HB 75 kHz",
+        "MSF":   "LF Radio MSF Anthorn, UK 60 kHz",
+        "JJY":   "LF Radio JJY Fukushima, JP 40 kHz, Saga, JP 60 kHz",
         "LORC":  "MF Radio LORAN C station, 100 kHz",
-        "TDF\0": "MF Radio Allouis, FR 162 kHz",
-        "CHU\0": "HF Radio CHU Ottawa, Ontario",
-        "WWV\0": "HF Radio WWV Ft. Collins, CO",
+        "TDF":   "MF Radio Allouis, FR 162 kHz",
+        "CHU":   "HF Radio CHU Ottawa, Ontario",
+        "WWV":   "HF Radio WWV Ft. Collins, CO",
         "WWVH":  "HF Radio WWVH Kauai, HI",
         "NIST":  "NIST telephone modem",
         "ACTS":  "NIST telephone modem",
         "USNO":  "USNO telephone modem",
-        "PTB\0": "European telephone modem",
+        "PTB":   "European telephone modem",
         "LOCL":  "uncalibrated local clock",
         "CESM":  "calibrated Cesium clock",
         "RBDM":  "calibrated Rubidium clock",
         "OMEG":  "OMEGA radionavigation system",
-        "DCN\0": "DCN routing protocol",
-        "TSP\0": "TSP time protocol",
-        "DTS\0": "Digital Time Service",
+        "DCN":   "DCN routing protocol",
+        "TSP":   "TSP time protocol",
+        "DTS":   "Digital Time Service",
         "ATOM":  "Atomic clock (calibrated)",
-        "VLF\0": "VLF radio (OMEGA,, etc.)",
+        "VLF":   "VLF radio (OMEGA,, etc.)",
         "1PPS":  "External 1 PPS input",
         "FREE":  "(Internal clock)",
         "INIT":  "(Initialization)",
-        "ROA\0": "Real Observatorio de la Armada",
-        "\0\0\0\0":   "NULL",
+        "ROA":   "Real Observatorio de la Armada",
+        "":      "NULL",
     }
     """reference identifier table"""
 
@@ -480,7 +480,7 @@ def ref_id_to_text(ref_id, stratum=2):
 
     # return the result as a string or dot-formatted IP address
     if 0 <= stratum <= 1:
-        text = "%c%c%c%c" % fields
+        text = ("%c%c%c%c" % fields).rstrip("\00")
         if text in NTP.REF_ID_TABLE:
             return NTP.REF_ID_TABLE[text]
         else:
