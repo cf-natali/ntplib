@@ -31,7 +31,7 @@ modules, it should work on any platform with a Python implementation.
 'no warning'
 >>> response.root_delay
 0.0046844482421875
->>> ntplib.ref_id_to_text(response.ref_id)
+>>> ntplib.ref_id_to_text(response.ref_id, response.stratum)
 193.190.230.66
 ```
 
